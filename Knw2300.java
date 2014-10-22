@@ -103,5 +103,10 @@ public class Robot {
         		break;
         	}
         }
+    	public static void runCollector(RXTXRobot r, int balls){
+    		for (int i = 0; i<balls;i++){
+    			r.runMotor(RXTXRobot.MOTOR1,88,760);
+    			r.sleep(500);
+    		}
 }
 }
