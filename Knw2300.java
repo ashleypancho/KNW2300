@@ -46,7 +46,7 @@ public class Robot {
     
     public static void servo(RXTXRobot r) {
         // Angle specified and then back
-        r.attachServo(RXTXRobot.SERVO1, 7);
+        r.attachServo(RXTXRobot.SERVO1, 8);
         r.sleep(1000);
         r.moveServo(RXTXRobot.SERVO1, 135);
         r.sleep(1000);
@@ -103,10 +103,15 @@ public class Robot {
         		break;
         	}
         }
-    	public static void runCollector(RXTXRobot r, int balls){
-    		for (int i = 0; i<balls;i++){
-    			r.runMotor(RXTXRobot.MOTOR1,88,760);
-    			r.sleep(500);
-    		}
-}
+    }
+    public static void runCollector(RXTXRobot r, int balls){
+    	for (int i = 0; i<balls;i++){
+    		r.runMotor(RXTXRobot.MOTOR1,88,760);
+    		r.sleep(500);
+    	}
+   	}
+    
+    public static void findSalinity(RXTXRobot r) {
+    	System.out.println(r.getConductivity());
+    }
 }
