@@ -9,7 +9,7 @@ public class Robot {
 	
 	public static void main(String[] args) {
 		RXTXRobot r = new ArduinoNano();
-		r.setPort("/dev/tty.wch ch341 USB=>RS232 1410");
+		r.setPort("/dev/tty.wch ch341 USB=>RS232 1420");
 		r.connect();
 		
 		/*int[] balls;
@@ -72,7 +72,20 @@ public class Robot {
 		//doSprint3(r);
 		
 		//testWater(r);
-		testSalinity(r);
+		
+		//testSalinity(r);
+		//testTurbidity(r);
+		
+        //	r.runEncodedMotor(right, -250, 213, left, -250, 213);
+		
+		//r.runMotor(RXTXRobot.MOTOR1, 200, 5000);
+		
+		//r.runEncodedMotor(right, -200, 500, left, 200, 500);
+		//leftTurn(r);
+		//rightTurn(r);
+        
+		sprint4(r);
+		
 		r.close();
 	}
     
@@ -302,7 +315,7 @@ public class Robot {
 		while(true)
 		{
 			int ping = r.getPing(PING_PIN);
-			r.runMotor(RXTXRobot.MOTOR1, -215, RXTXRobot.MOTOR2, 200, 0);
+			r.runMotor(RXTXRobot.MOTOR1, -205, RXTXRobot.MOTOR2, 200, 0);
 			if(ping<=i){
 				r.runMotor(RXTXRobot.MOTOR1,0,RXTXRobot.MOTOR2,0,0);
 				break;
@@ -346,6 +359,35 @@ public class Robot {
 		r.runEncodedMotor(right, -250, 250, left, -250, 250);
 		backwards(r,100);
 		releaseTheKraken(r);
+	}
+	
+	public static void goAwayFromWall(RXTXRobot r, int i){
+		final int PING_PIN = 4;
+		while(true) 
+		{ 
+			int ping = r.getPing(PING_PIN);
+			r.runMotor(RXTXRobot.MOTOR1, 200, RXTXRobot.MOTOR2, -200, 0);
+			if(ping>=i){
+				r.runMotor(RXTXRobot.MOTOR1,0,RXTXRobot.MOTOR2,0,0);
+				break;
+			}
+		}
+	}
+	
+	
+	
+	public static void sprint4(RXTXRobot r){
+		//int[] balls;
+		gotoWall(r,40);
+		/*balls = */testWater(r);
+		goAwayFromWall(r,100);
+		r.sleep(1000);
+		r.runEncodedMotor(right, -250, 520, left, -250, 520);
+		//gotoWall(r,40);
+		//spinnyThingy(r,balls[0]);
+		
+		
+		
 		
 	}
 	
