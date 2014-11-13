@@ -8,14 +8,24 @@ public class knw2300 {
 	static int left = RXTXRobot.MOTOR2;
 	
 	public static void main(String[] args) {
+		
 		RXTXRobot r = new ArduinoNano();
-		r.setPort("/dev/tty.wch ch341 USB=>RS232 1420");
+		r.setPort("/dev/tty.wch ch341 USB=>RS232 1410");
+		
+		RXTXRobot r2 = new ArduinoNano();
+		r2.setPort("/dev/tty.wch ch341 USB=>RS232 1420");
+		
 		r.connect();
-
-		//sprint4(r);
-		testTurbidity(r);
+		r2.connect();
+		
+		sprint4(r,r2);
+		//testTurbidity(r);
+		//testSalinity(r);
+		//spinnyThingy(r,5);
+		//stopAtLine(r,r2);
 		
 		r.close();
+		r2.close();
 	}
     
 	public static void motor(RXTXRobot r) {
@@ -25,7 +35,7 @@ public class knw2300 {
     
 	public static void ping(RXTXRobot r) {
 		// >15cm & <15cm
-		final int PING_PIN = 4;
+		final int PING_PIN = 13;
 		for (int x=0; true; ++x)
 		{
             //Read the ping sensor value, which is connected to pin 12
@@ -88,7 +98,7 @@ public class knw2300 {
 		r.refreshAnalogPins();
 		while (true){
 			r.refreshAnalogPins();
-			System.out.println(r.getAnalogPin(0));
+			System.out.println(r.getAnalogPin(1));
 			r.sleep(500);
 		}
 		//r.getAnalogPin(1);
@@ -113,9 +123,9 @@ public class knw2300 {
 	}
     
 	public static void spinnyThingy(RXTXRobot r, int balls){
-		r.attachMotor(RXTXRobot.MOTOR4,8);
+		r.attachMotor(RXTXRobot.MOTOR4,12);
 		for (int i = 0; i<balls;i++){
-			r.runMotor(RXTXRobot.MOTOR4,-65,1250);
+			r.runMotor(RXTXRobot.MOTOR4,65,1650);
 			r.sleep(500);
 		}
 	}
@@ -129,28 +139,17 @@ public class knw2300 {
 	}
     
     
-	public static void followLine(RXTXRobot r){
-		final int rightLine = 6;
-		final int leftLine = 7;
-		AnalogPin rLine = r.getAnalogPin(rightLine);
-		AnalogPin lLine = r.getAnalogPin(leftLine);
-		
-	}
-    
-	public static boolean isBlack(AnalogPin line){
-		try{
-			System.out.println(line.toString());
-			System.out.println("before");
-			
-			//if(line.getValue() == 1023){
-            //return true;
-			//}else{
-            //return false;
-			//}
-			return true;
-		}catch(Exception e){
-			System.out.println(e.getMessage());
-			return false;
+	public static void stopAtLine(RXTXRobot r, RXTXRobot r2){
+		final int line1 = 1;
+		final int line3 = 3;
+		r.runMotor(RXTXRobot.MOTOR1, 200, RXTXRobot.MOTOR2, -200, 0);
+		while(true){
+			r2.refreshAnalogPins();
+			System.out.println(r2.getAnalogPin(line1).toString() + "  " + r2.getAnalogPin(line3).toString());
+			if(r2.getAnalogPin(line1).getValue()<=800||r2.getAnalogPin(line3).getValue()<=800){
+				r.runMotor(RXTXRobot.MOTOR1, 0, RXTXRobot.MOTOR2, 0, 0);
+				break;
+			}
 		}
 		
 	}
@@ -159,7 +158,7 @@ public class knw2300 {
 		double salinity = 0;
 		int rawSalinity = r.getConductivity();
 		System.out.println(rawSalinity);
-		salinity = 0.0218*rawSalinity*rawSalinity - 30.202*rawSalinity + 11011;
+		salinity = 0.0372*rawSalinity*rawSalinity - 52.692*rawSalinity + 19255;
 		System.out.println(salinity);
 		final double smallBall = 0.25;
 		final double bigBall = 0.75;
@@ -205,9 +204,9 @@ public class knw2300 {
 			r.refreshAnalogPins();
 			int distance = r.getAnalogPin(3).getValue();
 			if (distance >=220){
-				r.sleep(1400);
+				r.sleep(2200);
 				r.runMotor(RXTXRobot.MOTOR1, 0, RXTXRobot.MOTOR2,0, 0);
-				r.runEncodedMotor(right, -250,450, left, -250, 450);
+				r.runEncodedMotor(right, -240,213, left, -250, 213);
 				break;
 			}
 		}
@@ -244,11 +243,25 @@ public class knw2300 {
 		while(true)
 		{
 			int ping = r.getPing(PING_PIN);
-			r.runMotor(RXTXRobot.MOTOR1, -205, RXTXRobot.MOTOR2, 200, 0);
+			r.runMotor(RXTXRobot.MOTOR1, -210, RXTXRobot.MOTOR2, 200, 0);
 			if(ping<=i){
 				r.runMotor(RXTXRobot.MOTOR1,0,RXTXRobot.MOTOR2,0,0);
 				break;
 			}
+		}
+	}
+    
+	public static void gotoWallBridge(RXTXRobot r, int i){
+		final int PING_PIN = 4;
+		while(true)
+		{
+			int ping = r.getPing(PING_PIN);
+			r.runMotor(RXTXRobot.MOTOR1, -310, RXTXRobot.MOTOR2, 300, 0);
+			if(ping<=i){
+				r.runMotor(RXTXRobot.MOTOR1,0,RXTXRobot.MOTOR2,0,0);
+				break;
+			}
+			
 		}
 	}
 	public static void irSensor(RXTXRobot r){
@@ -289,58 +302,58 @@ public class knw2300 {
 		backwards(r,100);
 		releaseTheKraken(r);
 		/*int[] balls;
-        gotoWall(r,40);
-        balls = testWater(r);
-        r.sleep(1000);
-        r.runEncodedMotor(right, -250, 480, left, -250, 480); //left
-        gotoWall(r,24);
-        r.runEncodedMotor(right, -250, 490, left, -250, 490);//left
-        r.runEncodedMotor(right, -225, 80, left, 250, 200);
-        r.runEncodedMotor(right, -225, 225, left, 250, 80);
-        //r.runEncodedMotor(right, -225, 80, left, 250, 200);
-        //r.runEncodedMotor(right, -225, 250, left, 200, 250); //ticks 300
-        if(balls[0]<=10){
-        spinnyThingy(r,5);
-        }else{
-        spinnyThingy(r,5);
-        }
-        r.runEncodedMotor(right, -225, 435, left, 200, 435);
-        if(balls[1]<=10){
-        spinnyThingy(r,5);
-        }else{
-        spinnyThingy(r,5);
-        }
-        r.runEncodedMotor(right, -225, 100, left, 200, 100);
-        r.runEncodedMotor(right, -250, 480, left, -250, 480);
-        gotoWall(r,30);
-        r.runEncodedMotor(right, -250, 480, left, -250, 480);
-        if(balls[3]<=10){
-        spinnyThingy(r,5);
-        }else{
-        spinnyThingy(r,5);
-        }
-        r.runEncodedMotor(right, -230, 435, left, 190, 435);
-        if(balls[2]<=10){
-        spinnyThingy(r,5);
-        }else{
-        spinnyThingy(r,5);
-        }
-        r.runEncodedMotor(right, -250, 450, left, -250, 450);
-        r.runEncodedMotor(right, -250, 450, left, -250, 450);
-        r.runEncodedMotor(right, -225, 500, left, 200, 450); //ticks 500
-        r.runEncodedMotor(right, 250, 450, left, 250, 450);
-        findBridge(r);
-        r.runEncodedMotor(right, -250, 1000, left, 225, 1000);
-        r.runEncodedMotor(right, -250, 250, left, -250, 250);
-        backwards(r,100);
-        releaseTheKraken(r);
-        /*testSalinity(r);     TESTS
-        //servo(r);
-        //testTurbidity(r);
-        //r.runEncodedMotor(right, -250, 213, left, -250, 213);
-        //r.runEncodedMotor(right, 250, 213, left, 250, 213);
-        //spinnyThingy(r,5);
-        //releaseTheKraken(r);*/
+         gotoWall(r,40);
+         balls = testWater(r);
+         r.sleep(1000);
+         r.runEncodedMotor(right, -250, 480, left, -250, 480); //left
+         gotoWall(r,24);
+         r.runEncodedMotor(right, -250, 490, left, -250, 490);//left
+         r.runEncodedMotor(right, -225, 80, left, 250, 200);
+         r.runEncodedMotor(right, -225, 225, left, 250, 80);
+         //r.runEncodedMotor(right, -225, 80, left, 250, 200);
+         //r.runEncodedMotor(right, -225, 250, left, 200, 250); //ticks 300
+         if(balls[0]<=10){
+         spinnyThingy(r,5);
+         }else{
+         spinnyThingy(r,5);
+         }
+         r.runEncodedMotor(right, -225, 435, left, 200, 435);
+         if(balls[1]<=10){
+         spinnyThingy(r,5);
+         }else{
+         spinnyThingy(r,5);
+         }
+         r.runEncodedMotor(right, -225, 100, left, 200, 100);
+         r.runEncodedMotor(right, -250, 480, left, -250, 480);
+         gotoWall(r,30);
+         r.runEncodedMotor(right, -250, 480, left, -250, 480);
+         if(balls[3]<=10){
+         spinnyThingy(r,5);
+         }else{
+         spinnyThingy(r,5);
+         }
+         r.runEncodedMotor(right, -230, 435, left, 190, 435);
+         if(balls[2]<=10){
+         spinnyThingy(r,5);
+         }else{
+         spinnyThingy(r,5);
+         }
+         r.runEncodedMotor(right, -250, 450, left, -250, 450);
+         r.runEncodedMotor(right, -250, 450, left, -250, 450);
+         r.runEncodedMotor(right, -225, 500, left, 200, 450); //ticks 500
+         r.runEncodedMotor(right, 250, 450, left, 250, 450);
+         findBridge(r);
+         r.runEncodedMotor(right, -250, 1000, left, 225, 1000);
+         r.runEncodedMotor(right, -250, 250, left, -250, 250);
+         backwards(r,100);
+         releaseTheKraken(r);
+         /*testSalinity(r);     TESTS
+         //servo(r);
+         //testTurbidity(r);
+         //r.runEncodedMotor(right, -250, 213, left, -250, 213);
+         //r.runEncodedMotor(right, 250, 213, left, 250, 213);
+         //spinnyThingy(r,5);
+         //releaseTheKraken(r);*/
 		//spinnyThingy(r,5);
 		//servo(r);
 		
@@ -352,7 +365,7 @@ public class knw2300 {
 		//testSalinity(r);
 		//testTurbidity(r);
 		
-       //	r.runEncodedMotor(right, -250, 213, left, -250, 213);
+        //	r.runEncodedMotor(right, -250, 213, left, -250, 213);
 		
 		//r.runMotor(RXTXRobot.MOTOR1, 200, 5000);
 		
@@ -363,8 +376,8 @@ public class knw2300 {
 	
 	public static void goAwayFromWall(RXTXRobot r, int i){
 		final int PING_PIN = 4;
-		while(true) 
-		{ 
+		while(true)
+		{
 			int ping = r.getPing(PING_PIN);
 			r.runMotor(RXTXRobot.MOTOR1, 200, RXTXRobot.MOTOR2, -200, 0);
 			if(ping>=i){
@@ -374,11 +387,11 @@ public class knw2300 {
 		}
 	}
 	
-	public static void findDispenser(RXTXRobot r){
-		final int sidePingPin = 0;
+	public static void findDispenser(RXTXRobot r, RXTXRobot r2){
+		final int sidePingPin = 13;
 		r.runMotor(RXTXRobot.MOTOR1, 200, RXTXRobot.MOTOR2, -200, 0);
 		while(true){
-			if(r.getDigitalPin(sidePingPin).getValue()<50){
+			if(r.getDigitalPin(sidePingPin).getValue()<130){
 				r.runMotor(RXTXRobot.MOTOR1, 0, RXTXRobot.MOTOR2, 0, 0);
 				r.runEncodedMotor(right, -250, 520, left, -250, 520);
 				break;
@@ -386,48 +399,51 @@ public class knw2300 {
 		}
 	}
 	public static void findBalls(RXTXRobot r){
-		final int bumpPin = 0;
+		final int bumpPin = 1;
 		r.runMotor(right, -200, left, 200, 0);
 		while(true){
-				r.refreshAnalogPins();
-				int bump = r.getAnalogPin(bumpPin).getValue();
-				if(bump>=10){
-					r.runMotor(right,0,left,0,0);
-					break;
-	             }
+            r.refreshAnalogPins();
+            int bump = r.getAnalogPin(bumpPin).getValue();
+            if(bump==0){
+                r.runMotor(right,0,left,0,0);
+                break;
+            }
 		}
 	}
 	
 	
-	public static void sprint4(RXTXRobot r){
+	
+	
+	public static void sprint4(RXTXRobot r, RXTXRobot r2){
 		int[] balls;
-		gotoWall(r,40);
+		gotoWall(r,33);
 		balls = testWater(r);
-		goAwayFromWall(r,100);
 		r.sleep(1000);
-		findDispenser(r);
+		stopAtLine(r,r2);
+		r.runEncodedMotor(right, -250, 500, left, -250, 500);
 		findBalls(r);
-		spinnyThingy(r,balls[0]);
-		goAwayFromWall(r,100);
+		spinnyThingy(r2,3);
+		goAwayFromWall(r,111);
 		r.runEncodedMotor(right, -250, 520, left, -250, 520);
 		r.runEncodedMotor(right, -250, 520, left, -250, 520);
 		findBalls(r);
-		spinnyThingy(r,balls[1]);
-		goAwayFromWall(r,100);
+		spinnyThingy(r2,3);
+		goAwayFromWall(r,111);
 		r.runEncodedMotor(right, -250, 520, left, -250, 520);
-		findDispenser(r);
+		stopAtLine(r, r2);
 		findBalls(r);
-		spinnyThingy(r,balls[2]);
-		goAwayFromWall(r,100);
+		spinnyThingy(r2,3);
+		goAwayFromWall(r,111);
 		findBalls(r);
-		spinnyThingy(r,balls[3]);
-		goAwayFromWall(r,50);
-		r.runEncodedMotor(right, 250, 520, left, 250, 520);
-		r.runEncodedMotor(right, 250, 520, left, 250, 520);
+		spinnyThingy(r2,3);
+		goAwayFromWall(r,25);
+		r.runEncodedMotor(right, 250, 213, left, 250, 213);
+		r.runEncodedMotor(right, 250, 213, left, 250, 213);
 		findBridge(r);
-		gotoWall(r,30);
-		r.runEncodedMotor(right, -250, 520, left, -250, 520);
-		goAwayFromWall(r,100);
+		gotoWallBridge(r,25);
+		r.runEncodedMotor(right, -250, 213, left, -250, 213);
+		goAwayFromWall(r,179);
+		releaseTheKraken(r);
 	}
 	
 	
