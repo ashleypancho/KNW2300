@@ -2,7 +2,7 @@
 package knw2300;
 import rxtxrobot.*;
 
-public class knw2300 {
+public class Knw2300 {
     
 	static int right = RXTXRobot.MOTOR1;
 	static int left = RXTXRobot.MOTOR2;
@@ -18,11 +18,17 @@ public class knw2300 {
 		r.connect();
 		r2.connect();
 		
+		//findBalls(r);
+		//dropLever(r);
 		sprint4(r,r2);
+		//leftTurn(r,r2);
 		//testTurbidity(r);
 		//testSalinity(r);
-		//spinnyThingy(r,5);
+		//spinnyThingy(r2,5);
 		//stopAtLine(r,r2);
+		//r.runEncodedMotor(right, -200, 10000, left, 200, 10000);
+		
+		
 		
 		r.close();
 		r2.close();
@@ -125,28 +131,39 @@ public class knw2300 {
 	public static void spinnyThingy(RXTXRobot r, int balls){
 		r.attachMotor(RXTXRobot.MOTOR4,12);
 		for (int i = 0; i<balls;i++){
-			r.runMotor(RXTXRobot.MOTOR4,65,1650);
+			r.runMotor(RXTXRobot.MOTOR4,65,1400);
 			r.sleep(500);
 		}
 	}
     
-	public static void rightTurn(RXTXRobot r){
-		r.runEncodedMotor(right, 250, 213, left, 250, 213);
-	}
 	
-	public static void leftTurn(RXTXRobot r){
-		r.runEncodedMotor(right, -250, 213, left, -250, 213);
+	public static void leftTurn(RXTXRobot r,RXTXRobot r2){
+		final int frontLine = 2;
+		
+		r.runMotor(right, -250, left, -250, 0);
+		while(true){
+			r2.refreshAnalogPins();
+			int i = r2.getAnalogPin(frontLine).getValue();
+			System.out.println(r2.getAnalogPin(frontLine).toString());
+			if(i<=800){
+				
+				//r.sleep(100);
+				r.runMotor(right, 0, left, 0, 0);
+				break;
+			}
+		}
 	}
     
     
 	public static void stopAtLine(RXTXRobot r, RXTXRobot r2){
 		final int line1 = 1;
 		final int line3 = 3;
-		r.runMotor(RXTXRobot.MOTOR1, 200, RXTXRobot.MOTOR2, -200, 0);
 		while(true){
+			r.runMotor(RXTXRobot.MOTOR1, 200,RXTXRobot.MOTOR2, -200, 0);
 			r2.refreshAnalogPins();
-			System.out.println(r2.getAnalogPin(line1).toString() + "  " + r2.getAnalogPin(line3).toString());
-			if(r2.getAnalogPin(line1).getValue()<=800||r2.getAnalogPin(line3).getValue()<=800){
+			System.out.println(r2.getAnalogPin(line1).toString() + "    " +r2.getAnalogPin(line3).toString() );
+			if(r2.getAnalogPin(line1).getValue()<=870||r2.getAnalogPin(line1).getValue()<=870){
+				r.sleep(300);
 				r.runMotor(RXTXRobot.MOTOR1, 0, RXTXRobot.MOTOR2, 0, 0);
 				break;
 			}
@@ -243,7 +260,7 @@ public class knw2300 {
 		while(true)
 		{
 			int ping = r.getPing(PING_PIN);
-			r.runMotor(RXTXRobot.MOTOR1, -210, RXTXRobot.MOTOR2, 200, 0);
+			r.runMotor(RXTXRobot.MOTOR1, -230, RXTXRobot.MOTOR2, 200, 0);
 			if(ping<=i){
 				r.runMotor(RXTXRobot.MOTOR1,0,RXTXRobot.MOTOR2,0,0);
 				break;
@@ -404,32 +421,46 @@ public class knw2300 {
 		while(true){
             r.refreshAnalogPins();
             int bump = r.getAnalogPin(bumpPin).getValue();
+            System.out.println(r.getAnalogPin(bumpPin).toString());
+            
             if(bump==0){
                 r.runMotor(right,0,left,0,0);
                 break;
             }
+            r.sleep(75);
 		}
 	}
 	
-	
+	public static void dropLever(RXTXRobot r){
+		r.attachServo(RXTXRobot.SERVO3, 9);
+		r.sleep(1000);
+		r.moveServo(RXTXRobot.SERVO3,0);
+		r.sleep(800);
+		r.moveServo(RXTXRobot.SERVO3,180);
+		r.sleep(10000);
+		//r.moveServo(RXTXRobot.SERVO3,0);
+		//r.sleep(1000);
+		
+		
+	}
 	
 	
 	public static void sprint4(RXTXRobot r, RXTXRobot r2){
 		int[] balls;
-		gotoWall(r,33);
+		gotoWall(r,35);
 		balls = testWater(r);
 		r.sleep(1000);
 		stopAtLine(r,r2);
-		r.runEncodedMotor(right, -250, 500, left, -250, 500);
+		r.runEncodedMotor(right, -250, 600);
 		findBalls(r);
 		spinnyThingy(r2,3);
 		goAwayFromWall(r,111);
-		r.runEncodedMotor(right, -250, 520, left, -250, 520);
-		r.runEncodedMotor(right, -250, 520, left, -250, 520);
+		r.runEncodedMotor(right, -250, 600);
+		r.runEncodedMotor(right, -250, 600);
 		findBalls(r);
 		spinnyThingy(r2,3);
 		goAwayFromWall(r,111);
-		r.runEncodedMotor(right, -250, 520, left, -250, 520);
+		r.runEncodedMotor(right, -250, 600);
 		stopAtLine(r, r2);
 		findBalls(r);
 		spinnyThingy(r2,3);
