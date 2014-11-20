@@ -23,9 +23,9 @@ public class Knw2300 {
 		//gotoWall(r,25);
 		//findBalls(r);
 		//dropLever(r);
-		sprint4(r,r2);
+		//sprint4(r,r2);
 		//leftTurn(r,r2);
-		//testTurbidity(r);
+		testTurbidity(r);
 		//testSalinity(r);
 		//spinnyThingy(r2,5);
         //	stopAtLine(r,r2);
@@ -209,10 +209,20 @@ public class Knw2300 {
 		final double smallBall = 5;
 		final double bigBall = 50;
 		final int turbidityPin = 2;
-		r.refreshAnalogPins();
-		int rawTurbidity = r.getAnalogPin(turbidityPin).getValue();
-		turbidity = 0.0011*rawTurbidity*rawTurbidity - 1.4026*rawTurbidity + 420.15;
-		System.out.println(rawTurbidity);
+		int avgTurbidity = 0;
+		
+		int rawTurbidity = 0;
+		for(int i=0; i<5; i++){
+			r.refreshAnalogPins();
+			rawTurbidity = r.getAnalogPin(turbidityPin).getValue();
+			System.out.println(rawTurbidity);
+			avgTurbidity += rawTurbidity;
+		}
+		System.out.println();
+		avgTurbidity = avgTurbidity/5;
+		System.out.println(avgTurbidity);
+		turbidity = -0.0005*avgTurbidity*avgTurbidity - .5669*avgTurbidity + 722.28;
+		//System.out.println(rawTurbidity);
 		System.out.println(turbidity);
 		int[] balls = new int[2];
 		while(turbidity>smallBall){
